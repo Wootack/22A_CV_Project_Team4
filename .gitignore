@@ -1,0 +1,12 @@
+.DS_Store
+.vscode
+.ipynb_checkpoints
+__pycache__
+
+darknet/cfg/*
+!darknet/cfg/.gitkeep
+
+data/*
+!data/.gitkeep
+
+results/*
