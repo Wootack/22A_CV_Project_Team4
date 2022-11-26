@@ -22,6 +22,7 @@ dependencies:
   - executing=0.8.3=pyhd3eb1b0_0
   - expat=2.4.9=h6a678d5_0
   - ffmpeg=4.2.2=h20bf706_0
+  - fftw=3.3.9=h27cfd23_1
   - fontconfig=2.13.1=hef1e5e3_1
   - fonttools=4.25.0=pyhd3eb1b0_0
   - freetype=2.12.1=h4a9f257_0
@@ -119,6 +120,7 @@ dependencies:
   - qt-webengine=5.15.9=hd2b0992_4
   - qtwebkit=5.212=h4eab89a_4
   - readline=8.2=h5eee18b_0
+  - scipy=1.9.3=py39h32ae08f_0
   - setuptools=65.5.0=py39h06a4308_0
   - sip=6.6.2=py39h6a678d5_0
   - six=1.16.0=pyhd3eb1b0_1
@@ -134,7 +136,18 @@ dependencies:
   - wheel=0.37.1=pyhd3eb1b0_0
   - x264=1!157.20191217=h7b6447c_0
   - xz=5.2.6=h5eee18b_0
+  - yaml=0.2.5=h7b6447c_0
   - zeromq=4.3.4=h2531618_0
   - zlib=1.2.13=h5eee18b_0
   - zstd=1.5.2=ha4553b6_0
+  - pip:
+    - charset-normalizer==2.1.1
+    - easydict==1.10
+    - idna==3.4
+    - pyyaml==6.0
+    - requests==2.28.1
+    - torch==1.12.1+cu113
+    - torchvision==0.13.1+cu113
+    - typing-extensions==4.4.0
+    - urllib3==1.26.13
 prefix: /home/wootackkim/.conda/envs/cv-pr
