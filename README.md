@@ -11,3 +11,6 @@ conda env update --name cv-pr --file environment.yaml --prune
 - After package installation, enter ```conda env export > environment.yaml``` to update environment.yaml file.
 - After pulling or fetching, update environment.
 - You may need to change prefix of environment.yaml file.
+
+
+https://drive.google.com/uc?id=1P4mY0Yyd3PPTybgZkjMYhFri88nTmJX5
