@@ -10,3 +10,8 @@ data/*
 !data/.gitkeep
 
 results/*
+
+video_track/ByteTrack/pretrained/bytetrack_x_mot17.pth.tar
+
+*.mp4
+*.pickle
