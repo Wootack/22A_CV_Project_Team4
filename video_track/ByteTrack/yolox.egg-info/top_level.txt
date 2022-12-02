@@ -1,8 +1,6 @@
-assets
-datasets
-deploy
+build
 exps
+pretrained
 tools
-tutorials
 videos
 yolox
