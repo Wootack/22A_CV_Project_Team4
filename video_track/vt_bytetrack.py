@@ -44,17 +44,23 @@ def save_video_result(video, id_tlwh_score_per_frame):
                 video.get(cv2.CAP_PROP_FPS),
                 (int(video.get(cv2.CAP_PROP_FRAME_WIDTH)),
                     int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+    color_tid=[(0,0,0) for i in range(100)]
     while True:
         ret, frame = video.read()
         if not ret: break
+        
+        
         if i == id_tlwh_score_per_frame[i][0]:
             for tid, (x1, y1, w, h) in zip(*id_tlwh_score_per_frame[i][1:3]):
-                team_color = get_color(frame, frameHeight, frameWidth,x1, y1, w, h)
+                if color_tid[tid]==(0,0,0): # not initialized
+                    color_tid[tid] = get_color(frame, frameHeight, frameWidth,x1, y1, w, h)
+                elif color_tid[tid]==(255,255,254):
+                    color_tid[tid] = get_color(frame, frameHeight, frameWidth,x1, y1, w, h)
                 frame = cv2.rectangle(frame, (int(x1), int(y1)),
                             (int(x1+w), int(y1+h)), 
-                            color=team_color, thickness=3)
+                            color=color_tid[tid], thickness=3)
                 frame = cv2.putText(frame,  str(tid), (int(x1), int(y1)),
-                    cv2.FONT_HERSHEY_PLAIN, 2, (0,0,255), 2)
+                    cv2.FONT_HERSHEY_PLAIN, 2, color_tid[tid], 2)
         vid_writer.write(frame)
         i+=1
     print('Result of tracking saved as ./results/bytetrack_result.mp4')
