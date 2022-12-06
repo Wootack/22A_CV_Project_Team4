@@ -2,8 +2,8 @@ LICENSE
 README.md
 setup.cfg
 setup.py
-/home/wootackkim/projects/CV/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc/vision.cpp
-/home/wootackkim/projects/CV/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc/cocoeval/cocoeval.cpp
+/home/wooseong/Course/CV/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc/vision.cpp
+/home/wooseong/Course/CV/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc/cocoeval/cocoeval.cpp
 exps/default/nano.py
 exps/default/yolov3.py
 exps/default/yolox_l.py
