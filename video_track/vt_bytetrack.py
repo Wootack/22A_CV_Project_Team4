@@ -1,5 +1,4 @@
 from easydict import EasyDict as edict
-import numpy as np
 import cv2
 
 from .ByteTrack.tools.track_video import external_call

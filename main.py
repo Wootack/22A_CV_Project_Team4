@@ -1,6 +1,5 @@
 import os
 
-import numpy as np
 import cv2
 
 from detect_human import dh_yolo
@@ -11,7 +10,7 @@ datapath = './data/'
 def main():
     os.makedirs('./results', exist_ok=True)
     print('Hi')
-    video1 = cv2.VideoCapture(datapath+'offside1.mp4')
+    video1 = cv2.VideoCapture(datapath+'Game.mp4')
     # dh_yolo.dh_yolo(video1)
     vt_bytetrack.vt_bytetrack(video1)
     print('DONE')
