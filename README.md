@@ -10,8 +10,8 @@ cd ./video_track/ByteTrack
 python setup.py develop
 cd ../..
 ```
-Download pre-trained model weight values from [this link](https://drive.google.com/uc?id=1P4mY0Yyd3PPTybgZkjMYhFri88nTmJX5) and upload it to '''./video_track/ByteTrack/pretrained/''' directory.
-Upload input mp4 video to '''./data''' directory.
+Download pre-trained model weight values from [this link](https://drive.google.com/uc?id=1P4mY0Yyd3PPTybgZkjMYhFri88nTmJX5) and upload it to ```./video_track/ByteTrack/pretrained/``` directory.
+Upload input mp4 video to ```./data``` directory.
 
 - Use ```conda install``` command to install packages. Use ```pip install``` only if it unavoidable.
 - After package installation, enter ```conda env export > environment.yaml``` to update environment.yaml file.
