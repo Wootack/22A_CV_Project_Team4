@@ -3,7 +3,7 @@ import argparse
 
 import cv2
 
-from detect_human import dh_yolo
+from detect_human import dh_yolo, dh_hsv
 from video_track import vt_bytetrack
 from team_cluster import team_cluster
 
@@ -38,7 +38,7 @@ def main(args):
         id_tlwh_score_per_frame = vt_bytetrack.vt_bytetrack(video1, args.save_video)
     elif args.tracking_method=='hsv':
         # TODO
-        raise NotImplementedError('Add This please.')
+        id_tlwh_score_per_frame = dh_hsv.dh_hsv(video1, args.save_video)
 
     team_cluster.team_cluster(id_tlwh_score_per_frame, args.save_video, video1)
     
