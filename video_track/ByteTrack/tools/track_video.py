@@ -123,7 +123,7 @@ def return_tracking(predictor, cap, track_params):
                 online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], predictor.test_size)
                 online_tlwhs = []
                 online_ids = []
-                online_scores = []
+                # online_scores = []
                 for t in online_targets:
                     tlwh = t.tlwh
                     tid = t.track_id
@@ -131,8 +131,10 @@ def return_tracking(predictor, cap, track_params):
                     if tlwh[2] * tlwh[3] > track_params.min_box_area and not vertical:
                         online_tlwhs.append(tlwh)
                         online_ids.append(tid)
-                        online_scores.append(t.score)
-                results.append([frame_id, online_ids, online_tlwhs, online_scores])
+                        # online_scores.append(t.score)
+                # results.append([frame_id, online_ids, online_tlwhs, online_scores])
+                results.append([online_ids, online_tlwhs])
+            else: results.append([[], [], []])
         else:
             break
         frame_id += 1

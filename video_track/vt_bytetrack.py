@@ -14,18 +14,18 @@ TRACK_PARAMS = edict({'fps' : 30,
 save_video = True
 
 def vt_bytetrack(video, save_video):
-    # id_tlwh_score_per_frame
+    # tids_tlwhs_list
     # Content : List of [frame_id, track_ids, tlwhs, scores]
     # tlwh = x1, y1, w, h
-    print('Tracking by ByteTrack ...')
-    id_tlwh_score_per_frame = external_call(video, TRACK_PARAMS)
-    print('Frame Length :', len(id_tlwh_score_per_frame))
-    if save_video: save_video_result(video, id_tlwh_score_per_frame)
-    return id_tlwh_score_per_frame
+    print('Tracking Human with ByteTrack ...')
+    video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    tids_tlwhs_list = external_call(video, TRACK_PARAMS)
+    if save_video: save_video_result(video, tids_tlwhs_list)
+    return tids_tlwhs_list
 
 
 
-def save_video_result(video, id_tlwh_score_per_frame):
+def save_video_result(video, tids_tlwhs_list):
     def gen_color(idx):
         idx = idx * 3
         color = ((37 * idx) % 255, (17 * idx) % 255, (29 * idx) % 255)
@@ -41,8 +41,8 @@ def save_video_result(video, id_tlwh_score_per_frame):
     while True:
         ret, frame = video.read()
         if not ret: break
-        if i == id_tlwh_score_per_frame[i][0]:
-            for tid, (x1, y1, w, h) in zip(*id_tlwh_score_per_frame[i][1:3]):
+        if i == tids_tlwhs_list[i][0]:
+            for tid, (x1, y1, w, h) in zip(*tids_tlwhs_list[i][1:3]):
                 frame = cv2.rectangle(frame, (int(x1), int(y1)),
                             (int(x1+w), int(y1+h)), 
                             color=gen_color(tid), thickness=3)
