@@ -11,6 +11,9 @@ python setup.py develop
 cd ../..
 ```
 Download pre-trained model weight values from [this link](https://drive.google.com/uc?id=1P4mY0Yyd3PPTybgZkjMYhFri88nTmJX5) and upload it to ```./video_track/ByteTrack/pretrained/``` directory.
+Also download ```coco.names```, ```yolov3.cfg```, and ```yolov3.weights``` from [this link](https://opencv-tutorial.readthedocs.io/en/latest/yolo/yolo.html) and upload them to ```./darknet/cfg/``` directory.
+
+
 Upload input mp4 video to ```./data``` directory.
 
 - Use ```conda install``` command to install packages. Use ```pip install``` only if it unavoidable.

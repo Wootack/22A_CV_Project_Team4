@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from yolox.utils import bboxes_iou
+from video_track.ByteTrack.yolox.utils import bboxes_iou
 
 import math
 

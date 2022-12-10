@@ -6,7 +6,7 @@ import os
 import torch
 import torch.nn as nn
 
-from yolox.exp import Exp as MyExp
+from video_track.ByteTrack.yolox.exp import Exp as MyExp
 
 
 class Exp(MyExp):

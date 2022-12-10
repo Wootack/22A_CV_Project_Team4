@@ -11,8 +11,8 @@ import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
 
-import yolox.utils.dist as comm
-from yolox.utils import configure_nccl
+import video_track.ByteTrack.yolox.utils.dist as comm
+from video_track.ByteTrack.yolox.utils import configure_nccl
 
 import os
 import subprocess

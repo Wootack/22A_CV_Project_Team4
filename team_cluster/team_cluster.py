@@ -20,14 +20,17 @@ def team_cluster(id_tlwh_score_per_frame, save_video, video1):
                     'referee':(0,0,1),
                     'not on ground':(255,255,254)}
 
-    framd_id=0
+    tid_set = set([])
+    for fid, tids, tlwh, scs in id_tlwh_score_per_frame:
+        tid_set = tid_set.union(set(tids))
+
     video1.set(cv2.CAP_PROP_POS_FRAMES, 0)
     frameWidth = int(video1.get(cv2.CAP_PROP_FRAME_WIDTH))	# 영상의 넓이(가로) 프레임
     frameHeight = int(video1.get(cv2.CAP_PROP_FRAME_HEIGHT))	# 영상의 높이(세로) 프레임
 
     red_tids = []
     blue_tids = []
-    color_tid=[(0,0,0) for i in range(100)] # 왜 100? -> tid의 길이가 계속 늘어날것같아서 걍 크게 잡음
+    color_tid=[(0,0,0) for i in range(1+max(list(tid_set)))] # 왜 100? -> tid의 길이가 계속 늘어날것같아서 걍 크게 잡음
     frame_id=0
     while True:
         ret, frame = video1.read()
@@ -47,9 +50,16 @@ def team_cluster(id_tlwh_score_per_frame, save_video, video1):
                 # center_y = int(y1 + h/2)
                 
                 # 이거 돌렸을 때 배열 크기 넘어가던데
-
-                
+                if len(color_tid) <= tid:
+                    print('-------')
+                    print(len(color_tid))
+                    print(tid)               
                 if color_tid[tid]==(0,0,0) or color_tid[tid]==(255,255,254): # not initialized
+
+                    # print('------')
+                    # print(mask_ground.shape)
+                    # print(int(min(frameHeight-1,y1+h)))
+                    # print(int(min(frameWidth-1,x1+w)))
                     if mask_ground[int(min(frameHeight-1,y1+h))][int(min(frameWidth-1,x1+w))]!=0\
                         or mask_ground[int(min(frameHeight-1,y1+h))][int(x1)]:  # player
                     # if mask_ground[int(y1+h)][int(x1+w)]!=0 or mask_ground[int(y1+h)][int(x1)]!=0: # bottom-left and right is grass
@@ -88,7 +98,10 @@ def save_video_result(video, id_tlwh_score_per_frame):
                 video.get(cv2.CAP_PROP_FPS),
                 (int(video.get(cv2.CAP_PROP_FRAME_WIDTH)),
                     int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))))
-    color_tid=[(0,0,0) for i in range(100)] # 왜 100? -> tid의 길이가 계속 늘어날것같아서 걍 크게 잡음
+    tid_set = set([])
+    for fid, tids, tlwh, scs in id_tlwh_score_per_frame:
+        tid_set = tid_set.union(set(tids))
+    color_tid=[(0,0,0) for i in range(1+max(list(tid_set)))] # 왜 100? -> tid의 길이가 계속 늘어날것같아서 걍 크게 잡음
     while True:
         ret, frame = video.read()
         if not ret: break

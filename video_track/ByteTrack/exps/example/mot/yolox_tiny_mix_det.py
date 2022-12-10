@@ -5,8 +5,8 @@ import torch
 import torch.nn as nn
 import torch.distributed as dist
 
-from yolox.exp import Exp as MyExp
-from yolox.data import get_yolox_datadir
+from video_track.ByteTrack.yolox.exp import Exp as MyExp
+from video_track.ByteTrack.yolox.data import get_yolox_datadir
 
 class Exp(MyExp):
     def __init__(self):

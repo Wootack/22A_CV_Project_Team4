@@ -5,7 +5,7 @@
 import torch
 import torch.distributed as dist
 
-from yolox.utils import synchronize
+from video_track.ByteTrack.yolox.utils import synchronize
 
 import random
 

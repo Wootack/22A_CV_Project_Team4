@@ -6,6 +6,7 @@ import cv2
 def dh_yolo(video):
     print('yolo_hi')
     PERSON_CLASS = 0
+    SPORTS_BALL = 32
 
     with open('darknet/cfg/coco.names') as f:
         labels = [line.strip() for line in f]
@@ -31,9 +32,9 @@ def dh_yolo(video):
             for detection in out:
                 scores = detection[5:]
                 class_id = np.argmax(scores)
-                if class_id != PERSON_CLASS: continue
+                # if class_id != SPORTS_BALL: continue
                 confidence = scores[class_id]
-                if confidence>0.5:
+                if confidence>0.1:
                     w = int(detection[2] * width)
                     h = int(detection[3] * height)
                     x = int((detection[0] - detection[2]/2) * width)

@@ -5,7 +5,7 @@
 import torch
 from torch.nn import Module
 
-from yolox.utils import LRScheduler
+from video_track.ByteTrack.yolox.utils import LRScheduler
 
 import ast
 import pprint

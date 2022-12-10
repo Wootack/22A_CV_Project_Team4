@@ -9,8 +9,8 @@ import torch
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.tensorboard import SummaryWriter
 
-from yolox.data import DataPrefetcher
-from yolox.utils import (
+from video_track.ByteTrack.yolox.data import DataPrefetcher
+from video_track.ByteTrack.yolox.utils import (
     MeterBuffer,
     ModelEMA,
     all_reduce_norm,

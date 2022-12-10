@@ -68,7 +68,6 @@ def postprocess(prediction, num_classes, conf_thre=0.7, nms_thre=0.45):
             output[i] = detections
         else:
             output[i] = torch.cat((output[i], detections))
-
     return output
 
 

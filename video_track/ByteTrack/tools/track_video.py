@@ -7,12 +7,12 @@ import torch
 from loguru import logger
 from easydict import EasyDict as edict
 
-from yolox.data.data_augment import preproc
-from yolox.exp import get_exp
-from yolox.utils import fuse_model, get_model_info, postprocess
-from yolox.utils.visualize import plot_tracking
-from yolox.tracker.byte_tracker import BYTETracker
-from yolox.tracking_utils.timer import Timer
+from video_track.ByteTrack.yolox.data.data_augment import preproc
+from video_track.ByteTrack.yolox.exp import get_exp
+from video_track.ByteTrack.yolox.utils import fuse_model, get_model_info, postprocess
+from video_track.ByteTrack.yolox.utils.visualize import plot_tracking
+from video_track.ByteTrack.yolox.tracker.byte_tracker import BYTETracker
+from video_track.ByteTrack.yolox.tracking_utils.timer import Timer
 
 default_track_params = edict({'fps' : 30,
                 'track_thresh' : 0.5,
