@@ -1,7 +1,41 @@
-from time import time
+# from time import time
 
 import numpy as np
 import cv2
+
+from .yolov7.detect import prepare_yolov7, detect
+
+def db_yolo_v7(video, init_ball):
+    print('Detecting Ball with YOLO v7 ...')
+    h = 10
+    w = 10
+    video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    x, y = init_ball
+    model, stride, device = prepare_yolov7()
+    fr = 0
+    ball_loc = np.zeros((int(video.get(cv2.CAP_PROP_FRAME_COUNT)), 4), dtype=int)
+    while True:
+        ret, frame = video.read()
+        if not ret: break
+        rs = max(y-200, 0)
+        re = min(y+h+200, frame.shape[0])
+        cs = max(x-200, 0)
+        ce = min(x+w+200, frame.shape[1])
+        cframe = frame[rs:re, cs:ce]
+        xywhs = detect(model, stride, device, cframe)
+        if len(xywhs)!=0:
+            min_dist = 9000000
+            for xc, yc, wc, hc in xywhs:
+                dist = (xc+cs - x)**2 + (yc+rs - y)**2
+                if dist < min_dist:
+                    min_dist = dist
+                    x, y, w, h = xc, yc, wc, hc
+            x += cs
+            y += rs
+            ball_loc[fr] = x, y, w, h
+        fr += 1
+    return ball_loc
+
 
 def db_yolo(video, init_ball):
     print('Detecting Ball with YOLO v3 ...')
@@ -16,21 +50,21 @@ def db_yolo(video, init_ball):
 
     ln = network.getLayerNames()
     ln = [ln[i-1] for i in network.getUnconnectedOutLayers()]
-    colors = np.random.uniform(0, 255, size=(len(labels), 3))
+    # colors = np.random.uniform(0, 255, size=(len(labels), 3))
 
     x, y = init_ball
     fr=0
-    ball_loc = - np.ones((int(video.get(cv2.CAP_PROP_FRAME_COUNT)), 4), dtype=int)
+    ball_loc = np.zeros((int(video.get(cv2.CAP_PROP_FRAME_COUNT)), 4), dtype=int)
     while True:
-        starttime = time()
+        # starttime = time()
         ret, frame = video.read()
+        if not ret: break
         rs = max(y-200, 0)
         re = min(y+h+200, frame.shape[0])
         cs = max(x-200, 0)
         ce = min(x+w+200, frame.shape[1])
         cframe = frame[rs:re, cs:ce]
         height, width = cframe.shape[:2]
-        if not ret: break
         blob = cv2.dnn.blobFromImage(cframe, 1/255., (416, 416), swapRB=True, crop=False)
         network.setInput(blob)
         output_from_network = network.forward(ln)
@@ -49,7 +83,7 @@ def db_yolo(video, init_ball):
                     y = int((detection[1] - detection[3]/2) * height)
                     boxes.append([x, y, w, h])
                     confidences.append(float(confidence))
-        indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
+        indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.1, 0.4)
         boxes = np.asarray(boxes)[indexes]
         if len(boxes) > 0:
             min_dist = 9000000
@@ -61,10 +95,9 @@ def db_yolo(video, init_ball):
             x += cs
             y += rs
             ball_loc[fr] = x, y, w, h
-            color = colors[0]
-            cv2.rectangle(frame, (x,y), (x+w,y+h), color, 2)
-        cv2.imwrite('./results/{}.png'.format(fr), frame)
+            # color = colors[0]
+            # cv2.rectangle(frame, (x,y), (x+w,y+h), color, 2)
+        # cv2.imwrite('./results/{}.png'.format(fr), frame)
         fr+=1
-        if fr > 10: break
     return ball_loc
 

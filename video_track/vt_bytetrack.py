@@ -20,7 +20,7 @@ def vt_bytetrack(video, save_video):
     print('Tracking Human with ByteTrack ...')
     video.set(cv2.CAP_PROP_POS_FRAMES, 0)
     tids_tlwhs_list = external_call(video, TRACK_PARAMS)
-    if save_video: save_video_result(video, tids_tlwhs_list)
+    # if save_video: save_video_result(video, tids_tlwhs_list)
     return tids_tlwhs_list
 
 

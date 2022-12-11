@@ -13,6 +13,7 @@ from video_track.ByteTrack.yolox.utils import fuse_model, get_model_info, postpr
 from video_track.ByteTrack.yolox.utils.visualize import plot_tracking
 from video_track.ByteTrack.yolox.tracker.byte_tracker import BYTETracker
 from video_track.ByteTrack.yolox.tracking_utils.timer import Timer
+from mask_crowd.mask_crowd import mask_crowd
 
 default_track_params = edict({'fps' : 30,
                 'track_thresh' : 0.5,
@@ -118,6 +119,7 @@ def return_tracking(predictor, cap, track_params):
     while True:
         ret_val, frame = cap.read()
         if ret_val:
+            frame = mask_crowd(frame)
             outputs, img_info = predictor.inference(frame)
             if outputs[0] is not None:
                 online_targets = tracker.update(outputs[0], [img_info['height'], img_info['width']], predictor.test_size)

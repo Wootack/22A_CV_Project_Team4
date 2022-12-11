@@ -6,6 +6,7 @@ def get_butt_HSV(box):
     h, w = box.shape[:2]
     butt = box[h//2:3*h//4, 2*w//5:3*w//5]
     bh, bw = butt.shape[:2]
+    if bh < 2 or bw < 2: return 0
     butt_hsv = cv2.cvtColor(butt, cv2.COLOR_BGR2HSV)
     butt_H = butt_hsv[:,:,0]
     butt_S = butt_hsv[:,:,1]
@@ -16,7 +17,7 @@ def get_butt_HSV(box):
     bins = np.array([1, 30, 80, 135, 160, 180])
     hist, _ = np.histogram(some_butt[:,:,0].flatten(), bins)
     category = np.argmax(hist)
-    if hist.sum() < 10 or category not in [0, 2, 4]: return 0 #'else'
+    if hist.sum() < 20 or category not in [0, 2, 4]: return 0 #'else'
     if category in [0, 4]: return 1 #'red'
     return 2 #'blue'
 
@@ -28,7 +29,7 @@ def team_cluster(human_tids_tlwhs_list, video1):
     for tids, tlwhs in human_tids_tlwhs_list:
         tid_set = tid_set.union(set(tids))
     tid_num = len(tid_set)
-    tid_list = np.array(tid_set)
+    tid_list = np.array(list(tid_set))
     tid_category_counter = np.zeros((tid_num, 3), dtype=int)
     fr = 0
     while True:
@@ -38,12 +39,27 @@ def team_cluster(human_tids_tlwhs_list, video1):
         for tid, (x1, y1, w, h) in zip(tids, tlwhs):
             x, y, w, h = int(x1), int(y1), int(w), int(h)
             category = get_butt_HSV(frame[y:y+h, x:x+w])
-            tid_category_counter[tid_list.index(tid), category] += 1
+            tid_category_counter[np.where(tid_list==tid)[0][0], category] += 1
         fr += 1
     tid_category = tid_category_counter.argmax(axis=1)
-    red_tids = tid_list[tid_category==1]
-    blue_tids = tid_list[tid_category==2]
-    return red_tids, blue_tids
+    red_tids = list(tid_list[tid_category==1])
+    blue_tids = list(tid_list[tid_category==2])
+    red_tlwhs_array, blue_tlwhs_array = modify_datastruct(human_tids_tlwhs_list, red_tids, blue_tids)
+    return red_tlwhs_array, blue_tlwhs_array
+
+
+def modify_datastruct(human_tids_tlwhs_list, red_tids, blue_tids):
+    frame_len = len(human_tids_tlwhs_list)
+    red_tlwhs_array = np.zeros((len(red_tids), frame_len, 4), dtype=int)
+    blue_tlwhs_array = np.zeros((len(blue_tids), frame_len, 4), dtype=int)
+    for fr, (tids, tlwhs) in enumerate(human_tids_tlwhs_list):
+        for tid, (x1, y1, w, h) in zip(tids, tlwhs):
+            x, y, w, h = int(x1), int(y1), int(w), int(h)
+            if tid in red_tids:
+                red_tlwhs_array[red_tids.index(tid), fr, :] = (x, y, w, h)
+            if tid in blue_tids:
+                blue_tlwhs_array[blue_tids.index(tid), fr, :] = (x, y, w, h)
+    return red_tlwhs_array, blue_tlwhs_array
 
 
 def team_cluster_obsolete(human_tids_tlwhs_list, save_video, video1):

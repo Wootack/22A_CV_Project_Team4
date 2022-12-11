@@ -11,6 +11,8 @@ data/*
 
 results/*
 
+detect_ball/yolov7/models/yolov7-e6e.pt
+
 video_track/ByteTrack/pretrained/bytetrack_x_mot17.pth.tar
 video_track/ByteTrack/build/temp.linux-x86_64-cpython-39/.ninja_log
 video_track/ByteTrack/build/temp.linux-x86_64-cpython-39/.ninja_deps
