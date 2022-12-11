@@ -1,83 +1,180 @@
-import os
-import argparse
-import pickle
+# import matplotlib
+# matplotlib.use('TkAgg')
+# import matplotlib.pyplot as plt
 
-import cv2
+from PoseEstimationUtils import *
+from VanishingPointUtils import *
+from TeamClassificationUtils import *
+from CoreOffsideUtils import *
+import demo.demo_multiperson as PoseGetter
+from scipy.misc import imread, imsave
+# import matplotlib.pyplot as plt
+from operator import itemgetter
 import numpy as np
-
-from detect_ball import db_yolo
-from detect_human import dh_yolo, dh_hsv
-from video_track import vt_bytetrack
-from team_cluster import team_cluster
-
-
-datapath = './data/'
-ATTACKER = 'red'
-RECEIVED = 'touch'
-INIT_BALL = np.array([879, 287])
+import math
+import json
+import sys
+import os
+import warnings
+warnings.filterwarnings("ignore")
 
 
-def make_parser():
-    parser = argparse.ArgumentParser("Offside Detecting System")
-    parser.add_argument("-iv", "--input-video", default="Game.mp4",
-            help="Name of input video file. Relative path in ./data directory. mp4 file is recommended.")
-    parser.add_argument("-tm", "--tracking-method", default="bytetrack", choices=['bytetrack', 'yolo', 'hsv'],
-            help="Determine player tracking method")
-    parser.add_argument("-sv", "--save-video", default=True, action="store_true", help="Save output video")
-    return parser
 
+#Image folder path
+# base_path = '/home/ameya/Projects/Offside_Detection_Final/Offside/pose_estimation/image_data/filtered_images/'
+# base_path = '/home/donghohan/compvision/Computer-Vision-based-Offside-Detection-in-Soccer/outputs/'
+base_path = '/home/donghohan/compvision/Computer-Vision-based-Offside-Detection-in-Soccer/dataset/Offside_Images/'
+tempFileNames = os.listdir(base_path)
+fileNames = []
+for fileName in tempFileNames:
+    fileNames.append(base_path+str(fileName))
 
-def main(args):
-    os.makedirs('./results', exist_ok=True)
-    print('Hi')
-    input_path = os.path.join(datapath, args.input_video)
-    if not os.path.exists(input_path):
-        raise Exception('Input Video not existing.')
+#Output image paths
+out_path = '/home/donghohan/compvision/Computer-Vision-based-Offside-Detection-in-Soccer/outputs/'
+vanishing_point_viz_base_path = out_path+'vp/'
+pose_estimation_viz_base_path = out_path+'pe/'
+team_classification_viz_base_path = out_path+'tc/'
+offside_viz_base_path = out_path+'final/'
+contour_path = out_path + 'ct/'
+files=[]
+if os.path.exists(vanishing_point_viz_base_path):
+	files = os.listdir(vanishing_point_viz_base_path)
+	for file in files:
+		os.remove(vanishing_point_viz_base_path+file)
+if os.path.exists(pose_estimation_viz_base_path):
+	files = os.listdir(pose_estimation_viz_base_path)    
+	for file in files:
+		os.remove(pose_estimation_viz_base_path+file)
+if os.path.exists(team_classification_viz_base_path):
+	files = os.listdir(team_classification_viz_base_path)    
+	for file in files:
+		os.remove(team_classification_viz_base_path+file)
+if os.path.exists(offside_viz_base_path):
+	files = os.listdir(offside_viz_base_path)    
+	for file in files:
+		os.remove(offside_viz_base_path+file)
+if os.path.exists(contour_path):
+	files = os.listdir(contour_path)    
+	for file in files:
+		os.remove(contour_path+file)
+if os.path.exists(out_path):
+	dirs = os.listdir(out_path)    
+	for dir in dirs:
+		os.rmdir(out_path+dir)
+	os.rmdir(out_path)
+os.makedirs(vanishing_point_viz_base_path, exist_ok=True)
+os.makedirs(pose_estimation_viz_base_path, exist_ok=True)
+os.makedirs(team_classification_viz_base_path, exist_ok=True)
+os.makedirs(offside_viz_base_path, exist_ok=True)
+os.makedirs(contour_path, exist_ok=True)
+print("Directory Setting Finish.")
 
-    print('Detecting Offside from', input_path)
-    # Single File
-    if os.path.isfile(input_path):
-        video1 = cv2.VideoCapture(input_path)
-        end_to_end_pipeline(video1, ATTACKER, RECEIVED, INIT_BALL, args)
+#Direction of goal
+goalDirection = 'right'
 
-    # All files in Directory
-    # The directory should include 'state.pickle', which specifies ...
-    # ... attacker, receiver's touch, and initial bounding boxes.
-    elif os.path.isdir(input_path):
-        filelist = os.listdir(input_path)
-        filelist.sort()
-        with open(os.path.join(input_path, 'state.pickle'), 'rb') as fp:
-            attack_teams, receive_touch, init_balls = pickle.load(fp)
-        for i, iv in enumerate(filelist):
-            if not iv.endswith('.mp4'): continue
-            input_video = os.path.join(input_path, iv)
-            video = cv2.VideoCapture(input_video)
-            end_to_end_pipeline(video, attack_teams[i], receive_touch[i],
-                    init_balls[i], args)
+keeper = [4.4931905696916325e-06, 4.450801979411523e-06, 5.510516736414265e-07, 0.00021567314734519837, 0.002188183807439825, 0.0015186984125557716, 0.7527352297592997, 1.0, 0.20787746170678337]
+referee = [8.72783130847647e-06, 1.5868784197229944e-07, 0.0, 0.0010298840944002235, 0.0002880184331797235, 0.002688172043010753, 0.3064516129032258, 0.05913978494623656, 1.0]
 
+# cnt=0 
+for file_itr in range(len(fileNames)):
 
-def end_to_end_pipeline(video1, attacker, received, init_ball, args):
-    # BALL DETECTION
-    ball_xywh_array = db_yolo.db_yolo(video1, init_ball)
+	# if(fileNames[file_itr]!='/home/donghohan/compvision/Computer-Vision-based-Offside-Detection-in-Soccer/dataset/Offside_Images/262.jpg'):
+	# 	if(cnt==1):		
+	# 		continue
+	# if(cnt==0):
+	# 	cnt=1
+ 
+	# if(fileNames[file_itr]!='/home/donghohan/compvision/Computer-Vision-based-Offside-Detection-in-Soccer/dataset/Offside_Images/6.jpg'):
+	# 	continue
+	print('\n\n', fileNames[file_itr])
+	# calculate vanishing points
+	imageForVanishingPoints = cv2.imread(fileNames[file_itr])
+	vertical_vanishing_point = get_vertical_vanishing_point(imageForVanishingPoints, goalDirection)
+	horizontal_vanishing_point = get_horizontal_vanishing_point(imageForVanishingPoints)
+	cv2.imwrite(vanishing_point_viz_base_path+tempFileNames[file_itr], imageForVanishingPoints)
+	print('Finished Vanishing Point calculation')
+	# get pose estimaitons and team classifications
+	imageForPoseEstimation = cv2.imread(fileNames[file_itr])
+	imageForPoseEstimation_2 = imread(fileNames[file_itr], mode='RGB')
+	# contour check
+	# _, contour_image = PoseGetter.get_contours(imageForPoseEstimation)
+	# cv2.imwrite(contour_path+tempFileNames[file_itr], contour_image)
+ 	
+	pose_estimations, isKeeperFound, isRefFound, temp_image = PoseGetter.return_pose(imageForPoseEstimation_2, imageForPoseEstimation, keeper, referee)
+	cv2.imwrite(base_path+'sub/'+tempFileNames[file_itr], temp_image)
+	pose_estimations = sorted(pose_estimations, key=lambda x : x[-1][0])
+	pose_estimations = update_pose_left_most_point(vertical_vanishing_point, horizontal_vanishing_point, pose_estimations, imageForPoseEstimation, goalDirection)
+	print('Finished Pose Estimation & Team Classifiaciton')
+	# pose_estimations structure -> [id, teamId, keyPoints, leftmostPoint]
+	pose_estimations = get_leftmost_point_angles(vertical_vanishing_point, pose_estimations, imageForPoseEstimation, goalDirection)
+	print('Finished updating leftmost point using angle')
+	# pose_estimations structure -> [id, teamId, keyPoints, leftmostPoint, angleAtVanishingPoint]
+	pose_estimations = sorted(pose_estimations, key=lambda x : x[-1])
+	font = cv2.FONT_HERSHEY_SIMPLEX
+	for pose in pose_estimations:
+		cv2.putText(imageForPoseEstimation, str(str(pose[0])), (int(pose[-2][-1]), int(pose[-2][0])), font, 1, (200,255,155), 2, cv2.LINE_AA)
+		cv2.line(imageForPoseEstimation, (int(vertical_vanishing_point[0]) , int(vertical_vanishing_point[1])) , (int(pose[-2][-1]), int(pose[-2][0])), (0,255,0) , 2 )
+	# cv2.imwrite(pose_estimation_viz_base_path+tempFileNames[file_itr], imageForPoseEstimation)
+	# visualize teams
+	imageForTeams = cv2.imread(fileNames[file_itr])
+	for pose in pose_estimations:
+		font = cv2.FONT_HERSHEY_SIMPLEX
+		cv2.putText(imageForTeams, str(pose[1]), (int(pose[-2][-1]), int(pose[-2][0])), font, 1, (200,255,155), 2, cv2.LINE_AA)
+	cv2.imwrite(team_classification_viz_base_path+tempFileNames[file_itr], imageForTeams)
+	# get offside decisions
+	pose_estimations, last_defending_man = get_offside_decision(pose_estimations, vertical_vanishing_point, 0, 1, isKeeperFound)
+	# pose_estimations structure -> [id, teamId, keyPoints, leftmostPoint, angleAtVanishingPoint, offsideDecision]
+	print('Starting Core Offside Algorithm')
+	imageForOffside = cv2.imread(fileNames[file_itr])
+	for pose in pose_estimations:
+		if pose[1] == 0:
+			if pose[-1] == 'off':
+				font = cv2.FONT_HERSHEY_SIMPLEX
+				cv2.putText(imageForOffside, 'off', (int(pose[-3][-1]), int(pose[-3][0]-10)), font, 1, (200,255,155), 2, cv2.LINE_AA)
+				cv2.line(imageForOffside , (int(vertical_vanishing_point[0]) , int(vertical_vanishing_point[1])) , (int(pose[-3][-1]), int(pose[-3][0])), (0,255,0) , 2 )
+			else:
+				font = cv2.FONT_HERSHEY_SIMPLEX
+				cv2.putText(imageForOffside, 'on', (int(pose[-3][-1]), int(pose[-3][0]-10)), font, 1, (200,255,155), 2, cv2.LINE_AA)
+		elif pose[1] == 1:
+			if pose[0] == last_defending_man:
+				cv2.putText(imageForOffside, 'last man', (int(pose[-3][-1]), int(pose[-3][0]-15)), font, 1, (200,255,155), 2, cv2.LINE_AA)
+				cv2.line(imageForOffside , (int(vertical_vanishing_point[0]) , int(vertical_vanishing_point[1])) , (int(pose[-3][-1]), int(pose[-3][0])), (0,255,0) , 2 )
+			else:
+				cv2.putText(imageForOffside, 'def', (int(pose[-3][-1]), int(pose[-3][0]-15)), font, 1, (200,255,155), 2, cv2.LINE_AA)
+				cv2.line(imageForOffside , (int(vertical_vanishing_point[0]) , int(vertical_vanishing_point[1])) , (int(pose[-3][-1]), int(pose[-3][0])), (0,255,0) , 2 )				
+		elif pose[1] == 2:
+			cv2.putText(imageForOffside, 'keep', (int(pose[-3][-1]), int(pose[-3][0]-10)), font, 1, (200,255,155), 2, cv2.LINE_AA)
+			cv2.line(imageForOffside , (int(vertical_vanishing_point[0]) , int(vertical_vanishing_point[1])) , (int(pose[-3][-1]), int(pose[-3][0])), (0,255,0) , 2 )
+		elif pose[1] == 3:
+			cv2.putText(imageForOffside, 'ref', (int(pose[-3][-1]), int(pose[-3][0]-10)), font, 1, (200,255,155), 2, cv2.LINE_AA)
+			cv2.line(imageForOffside , (int(vertical_vanishing_point[0]) , int(vertical_vanishing_point[1])) , (int(pose[-3][-1]), int(pose[-3][0])), (0,255,0) , 2 )
+	cv2.imwrite(offside_viz_base_path+tempFileNames[file_itr][:-4]+'_1.jpg', imageForOffside)
+	# exchange attacking and defending teams, get offside decisions
+	pose_estimations, last_defending_man = get_offside_decision(pose_estimations, vertical_vanishing_point, 1, 0, isKeeperFound)
+	# pose_estimations structure -> [id, teamId, keyPoints, leftmostPoint, angleAtVanishingPoint, offsideDecision]
+	imageForOffside = cv2.imread(fileNames[file_itr])
+	for pose in pose_estimations:
+		if pose[1] == 1:
+			if pose[-1] == 'off':
+				font = cv2.FONT_HERSHEY_SIMPLEX
+				cv2.putText(imageForOffside, 'off', (int(pose[-3][-1]), int(pose[-3][0]-10)), font, 1, (200,255,155), 2, cv2.LINE_AA)
+				cv2.line(imageForOffside , (int(vertical_vanishing_point[0]) , int(vertical_vanishing_point[1])) , (int(pose[-3][-1]), int(pose[-3][0])), (0,255,0) , 2 )
+			else:
+				font = cv2.FONT_HERSHEY_SIMPLEX
+				cv2.putText(imageForOffside, 'on', (int(pose[-3][-1]), int(pose[-3][0]-10)), font, 1, (200,255,155), 2, cv2.LINE_AA)
+		elif pose[1] == 0:
+			if pose[0] == last_defending_man:
+				cv2.putText(imageForOffside, 'last man', (int(pose[-3][-1]), int(pose[-3][0]-15)), font, 1, (200,255,155), 2, cv2.LINE_AA)
+				cv2.line(imageForOffside , (int(vertical_vanishing_point[0]) , int(vertical_vanishing_point[1])) , (int(pose[-3][-1]), int(pose[-3][0])), (0,255,0) , 2 )
+			else:
+				cv2.putText(imageForOffside, 'def', (int(pose[-3][-1]), int(pose[-3][0]-15)), font, 1, (200,255,155), 2, cv2.LINE_AA)
+				cv2.line(imageForOffside , (int(vertical_vanishing_point[0]) , int(vertical_vanishing_point[1])) , (int(pose[-3][-1]), int(pose[-3][0])), (0,255,0) , 2 )
+		elif pose[1] == 2:
+			cv2.putText(imageForOffside, 'keep', (int(pose[-3][-1]), int(pose[-3][0]-10)), font, 1, (200,255,155), 2, cv2.LINE_AA)
+			cv2.line(imageForOffside , (int(vertical_vanishing_point[0]) , int(vertical_vanishing_point[1])) , (int(pose[-3][-1]), int(pose[-3][0])), (0,255,0) , 2 )
+		elif pose[1] == 3:
+			cv2.putText(imageForOffside, 'ref', (int(pose[-3][-1]), int(pose[-3][0]-10)), font, 1, (200,255,155), 2, cv2.LINE_AA)
+			cv2.line(imageForOffside , (int(vertical_vanishing_point[0]) , int(vertical_vanishing_point[1])) , (int(pose[-3][-1]), int(pose[-3][0])), (0,255,0) , 2 )
+	cv2.imwrite(offside_viz_base_path+tempFileNames[file_itr][:-4]+'_2.jpg', imageForOffside)
 
-    # HUMAN DETECTION
-    if args.tracking_method=='yolo':
-        raise NotImplementedError()
-        human_tids_tlwhs_list = dh_yolo.dh_yolo(video1) # return of dh_yolo should be modified
-    elif args.tracking_method=='bytetrack':
-        human_tids_tlwhs_list = vt_bytetrack.vt_bytetrack(video1, args.save_video)
-    elif args.tracking_method=='hsv':
-        human_tids_tlwhs_list = dh_hsv.dh_hsv(video1, args.save_video)
-
-    with open('./temp.pickle', 'wb') as fp:
-        pickle.dump(human_tids_tlwhs_list, fp, pickle.HIGHEST_PROTOCOL)
-
-    # TEAM CLUSTERING
-    red_tids, blue_tids = team_cluster.team_cluster(human_tids_tlwhs_list, video1)
-    
-    print('DONE')
-
-
-if __name__ == '__main__':
-    args = make_parser().parse_args()
-    main(args)
+	print(file_itr,fileNames[file_itr])
