@@ -15,9 +15,10 @@ from label_offside_players.label_offside_players import label_offside_players
 
 datapath = './data/'
 resultpath = './results/'
-ATTACKER = 'red'
+ATTACKER = 'blue'
 DIRECTION = 'left'
 INIT_BALL = np.array([879, 287])
+START_FRAME = 0
 
 
 def make_parser():
@@ -32,7 +33,7 @@ def make_parser():
 
 def main(args):
     os.makedirs(resultpath, exist_ok=True)
-    print('Hi')
+    # print('Hi')
     input_path = os.path.join(datapath, args.input_video)
     output_path = os.path.join(resultpath, args.input_video)
     if not os.path.exists(input_path):
@@ -81,11 +82,15 @@ def end_to_end_pipeline(video1, attacker, direction, init_ball, args, out_path):
     # TEAM CLUSTERING
     red_tlwhs_array, blue_tlwhs_array = team_cluster.team_cluster(human_tids_tlwhs_list, video1)
 
-    red_tags_list, blue_tags_list = label_offside_players(video1, red_tlwhs_array, blue_tlwhs_array, attacker, direction)
+    redPlayerInfo, bluePlayerInfo = label_offside_players(video1, START_FRAME, red_tlwhs_array, blue_tlwhs_array, attacker, direction)
+    # red_tags_list, blue_tags_list = label_offside_players(video1, red_tlwhs_array, blue_tlwhs_array, attacker, direction)
 
     if args.save_video:
-        save_video.save_video(video1, ball_xywh_array,
-            red_tlwhs_array, blue_tlwhs_array, out_path)
+        save_video.save_video(video1, START_FRAME, ball_xywh_array,
+            red_tlwhs_array, blue_tlwhs_array, redPlayerInfo, bluePlayerInfo, out_path)
+        
+        # save_video.save_video_basic(video1, ball_xywh_array,
+        #     red_tlwhs_array, blue_tlwhs_array, out_path)
     
     print('DONE')
 
