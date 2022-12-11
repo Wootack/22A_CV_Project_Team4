@@ -184,5 +184,5 @@ for file_itr in range(len(fileNames)):
 			break
 	cap.release()
 	out.release()
-	if file_itr == 0:
-		break
+	# if file_itr == 0:
+	# 	break
