@@ -27,3 +27,6 @@ models/*
 LICENSE
 green.jpg
 test/gray/*
+test/graytest2/
+test/graytest3/
+test/graytest4/

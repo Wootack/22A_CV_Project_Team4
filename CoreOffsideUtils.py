@@ -3,6 +3,7 @@ def get_offside_decision(pose_estimations, vertical_vanishing_point, attackingTe
 	# get last defending man
 	currMinAngle = 360.0
 	last_defending_man = -1
+	# pose_estimations structure -> [id, teamId, keyPoints, leftmostPoint, angleAtVanishingPoint]
 	for pose in pose_estimations:
 		if pose[1] in [defendingTeamId, 2]:
 			if pose[-1] not in ['on', 'off', 'def', 'ref']:
