@@ -38,7 +38,7 @@ def db_yolo_v7(video, init_ball):
 
 
 def db_yolo(video, init_ball):
-    print('Detecting Ball with YOLO v3 ...')
+    print(' with YOLO v3 ...')
     SPORTS_BALL = 32
     h = 10
     w = 10
@@ -49,7 +49,12 @@ def db_yolo(video, init_ball):
     network = cv2.dnn.readNet('darknet/cfg/yolov3.weights', 'darknet/cfg/yolov3.cfg')
 
     ln = network.getLayerNames()
-    ln = [ln[i-1] for i in network.getUnconnectedOutLayers()]
+    # print(ln)
+    # print(network.getUnconnectedOutLayers())
+    # for python=3.7
+    ln = [ln[i[0]-1] for i in network.getUnconnectedOutLayers()]
+    
+    # ln = [ln[i-1] for i in network.getUnconnectedOutLayers()]
     # colors = np.random.uniform(0, 255, size=(len(labels), 3))
 
     x, y = init_ball
@@ -87,6 +92,9 @@ def db_yolo(video, init_ball):
         boxes = np.asarray(boxes)[indexes]
         if len(boxes) > 0:
             min_dist = 9000000
+            # print(boxes)
+            # for python=3.7
+            boxes = boxes[0]
             for xc, yc, wc, hc in boxes:
                 dist = (xc+cs - x)**2 + (yc+rs - y)**2
                 if dist < min_dist:

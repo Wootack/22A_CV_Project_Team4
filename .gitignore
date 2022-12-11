@@ -19,3 +19,16 @@ video_track/ByteTrack/build/temp.linux-x86_64-cpython-39/.ninja_deps
 
 *.mp4
 *.pickle
+
+dataset/*
+!dataset/.gitkeep
+
+models/*
+!models/.gitkeep
+
+LICENSE
+green.jpg
+test/gray/*
+test/graytest2/
+test/graytest3/
+test/graytest4/
