@@ -8,9 +8,9 @@ conda activate cv_Offside_Detection
 cd ./video_track/ByteTrack
 python setup.py develop
 cd ../..
+python main.py -iv test.mp4
 ```
-Download pre-trained model weight values from [this link](https://drive.google.com/uc?id=1P4mY0Yyd3PPTybgZkjMYhFri88nTmJX5) and upload it to ```./video_track/ByteTrack/pretrained/``` directory.
-Also download ```coco.names```, ```yolov3.cfg```, and ```yolov3.weights``` from [this link](https://opencv-tutorial.readthedocs.io/en/latest/yolo/yolo.html) and upload them to ```./darknet/cfg/``` directory.
-
-
-Upload input mp4 video to ```./data``` directory.
+All the files to run the code: download from [this link](https://drive.google.com/drive/folders/1hTEujaJH1knKA6AQ_BgsIJ9vV6QLswsV?usp=share_link)
+- Upload ```bytetrack_x_mot17.pth.tar``` to ```./video_track/ByteTrack/pretrained/``` directory.
+- Upload ```coco.names```, ```yolov3.cfg```, and ```yolov3.weights``` to ```./darknet/cfg/``` directory.
+- Upload input mp4 video to ```./data``` directory.
