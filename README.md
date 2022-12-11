@@ -3,9 +3,8 @@
 
 Follow these steps for initial configuration.
 ```bash
-conda create -y --no-default-packages -n cv-pr python=3.9.15
-conda activate cv-pr
-conda env update --name cv-pr --file environment.yaml --prune
+conda env create -n cv_Offside_Detection -f py37environment.yml
+conda activate cv_Offside_Detection
 cd ./video_track/ByteTrack
 python setup.py develop
 cd ../..
@@ -15,10 +14,3 @@ Also download ```coco.names```, ```yolov3.cfg```, and ```yolov3.weights``` from 
 
 
 Upload input mp4 video to ```./data``` directory.
-
-- Use ```conda install``` command to install packages. Use ```pip install``` only if it unavoidable.
-- After package installation, enter ```conda env export > environment.yaml``` to update environment.yaml file.
-- After pulling or fetching, update environment.
-- You may need to change prefix of environment.yaml file.
-
-Codes for ByteTrack algorithm are borrowed from [ByteTrack](https://github.com/ifzhang/ByteTrack) and modified for our purpose. Thanks for their wonderful work.
