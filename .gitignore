@@ -32,3 +32,5 @@ test/gray/*
 test/graytest2/
 test/graytest3/
 test/graytest4/
+
+outputs/*

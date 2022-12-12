@@ -18,7 +18,7 @@ resultpath = './results/'
 ATTACKER = 'blue'
 DIRECTION = 'left'
 INIT_BALL = np.array([879, 287])
-START_FRAME = 0
+START_FRAME = 110
 
 
 def make_parser():
