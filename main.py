@@ -15,13 +15,17 @@ from label_offside_players.label_offside_players import label_offside_players
 
 datapath = './data/'
 resultpath = './results/'
-ATTACKER = 'blue'
-# ATTACKER = 'red'
 DIRECTION = 'left'
 INIT_BALL = np.array([879, 287])
-START_FRAME = 310
 isBall = True
 
+# for 014.mp4
+# ATTACKER = 'blue'
+# START_FRAME = 110
+
+# for test2.mp4
+ATTACKER = 'red'
+START_FRAME = 310
 
 def make_parser():
     parser = argparse.ArgumentParser("Offside Detecting System")

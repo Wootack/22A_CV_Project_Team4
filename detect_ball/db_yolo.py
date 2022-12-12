@@ -37,16 +37,18 @@ def db_yolo_v7(video, init_ball):
     return ball_loc
 
 
-def db_yolo(video, init_ball):
+def db_yolo(video, init_ball, isWrite=False):
     print(' with YOLO v3 ...')
     SPORTS_BALL = 32
     h = 10
     w = 10
-    vid_writer = cv2.VideoWriter('./ball_result.mp4',
-            cv2.VideoWriter_fourcc(*"mp4v"),
-            video.get(cv2.CAP_PROP_FPS),
-            (int(video.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+    vid_writer = None
+    if isWrite:
+        vid_writer = cv2.VideoWriter('./results/ball_result.mp4',
+                cv2.VideoWriter_fourcc(*"mp4v"),
+                video.get(cv2.CAP_PROP_FPS),
+                (int(video.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                    int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))))
     video.set(cv2.CAP_PROP_POS_FRAMES, 0)
     with open('darknet/cfg/coco.names') as f:
         labels = [line.strip() for line in f]
@@ -99,15 +101,16 @@ def db_yolo(video, init_ball):
         confs = np.asarray(confidences)[indexes]
         dsts = np.asarray(dists)[indexes]
         # print(boxes)
-        if len(boxes) > 0:
-            for cf, (xc, yc, wc, hc) in zip(dsts, boxes[0]):
-                x1loc = int(xc+cs)
-                y1loc = int(yc+rs)
-                x2loc = x1loc + int(wc)
-                y2loc = y1loc + int(hc)
-                cv2.rectangle(frame, (x1loc,y1loc), (x2loc,y2loc), (255,255,0), 2)
-                cv2.putText(frame, str(cf), (x1loc,y1loc), 2, 2, (0,0,255), 2)
-            vid_writer.write(frame)
+        if isWrite:
+            if len(boxes) > 0:
+                for cf, (xc, yc, wc, hc) in zip(dsts, boxes[0]):
+                    x1loc = int(xc+cs)
+                    y1loc = int(yc+rs)
+                    x2loc = x1loc + int(wc)
+                    y2loc = y1loc + int(hc)
+                    cv2.rectangle(frame, (x1loc,y1loc), (x2loc,y2loc), (255,255,0), 2)
+                    cv2.putText(frame, str(cf), (x1loc,y1loc), 2, 2, (0,0,255), 2)
+                vid_writer.write(frame)
         if len(boxes) > 0:
             min_dist = 9000000
             for xc, yc, wc, hc in boxes[0]:
@@ -124,5 +127,6 @@ def db_yolo(video, init_ball):
             # cv2.rectangle(frame, (x,y), (x+w,y+h), color, 2)
         # cv2.imwrite('./results/{}.png'.format(fr), frame)
         fr+=1
-    vid_writer.release()
+    if isWrite:
+        vid_writer.release()
     return ball_loc
