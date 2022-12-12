@@ -2,10 +2,11 @@ import cv2
 # import sys
 # sys.path.append('/home/donghohan/compvision/final/22A_CV_Project_Team4/')
 from VanishingPointUtils import *
+from newVPUtils import getVP
 
 def makeAngles(verticalVP, playerInfo, direction):
     for player in playerInfo:
-        anglewithVP = get_angle(verticalVP, (player[1][1], player[1][0]), None, direction)
+        anglewithVP = get_angle(verticalVP, (player[1][0], player[1][1]), None, direction)
         player.append(anglewithVP)
         
     return playerInfo
@@ -37,19 +38,26 @@ def findLastDefender(rtPlayerInfo, btPlayerInfo, attacker):
         defenderAngle = 360.0
         lastDefender = -1        
         for player in rtPlayerInfo:
-            if player[2] < defenderAngle:
-                defenderAngle = player[2]
+            if player[3] < defenderAngle and player[2]!=0:
+                defenderAngle = player[3]
                 lastDefender = player[0]
         for player in rtPlayerInfo:
             player.append('def')
 
-                    
+        # first_player_degree=0
         # find on/off
         for player in btPlayerInfo:
-            if player[2] < defenderAngle:
+            if player[3] < defenderAngle and player[2]!=0:
                 player.append('off')
             else:
                 player.append('on')
+            # if player[0]==1:
+            #     first_player_degree = player[3]
+            print("Player "+str(player[0])+"'s degree is "+str(player[3]))
+
+
+        print("Last Defender is "+str(lastDefender)+", degree is "+str(defenderAngle))
+        # print("Player 1's degree is "+str(first_player_degree))
     # attack:red, defend:blue
     else:
         # uses keeper
@@ -58,8 +66,8 @@ def findLastDefender(rtPlayerInfo, btPlayerInfo, attacker):
         # keeper = -1
         # lastDefender = -1        
         # for player in btPlayerInfo:
-        #     if player[2] < keeperAngle:
-        #         keeperAngle = player[2]
+        #     if player[3] < keeperAngle:
+        #         keeperAngle = player[3]
         #         keeper = player[0]
         # for player in btPlayerInfo:
         #     if player[0] == keeper:
@@ -67,26 +75,27 @@ def findLastDefender(rtPlayerInfo, btPlayerInfo, attacker):
         #     else:
         #         player.append('def')
         #     # player.append('def')
-        #     if player[2] < defenderAngle and player[0] != keeper:
-        #         defenderAngle = player[2]
+        #     if player[3] < defenderAngle and player[0] != keeper:
+        #         defenderAngle = player[3]
         #         lastDefender = player[0]
 
         
         defenderAngle = 360.0
         lastDefender = -1        
         for player in btPlayerInfo:
-            if player[2] < defenderAngle:
-                defenderAngle = player[2]
+            if player[3] < defenderAngle:
+                defenderAngle = player[3]
                 lastDefender = player[0]
         for player in btPlayerInfo:
             player.append('def')
                     
         # find on/off
         for player in rtPlayerInfo:
-            if player[2] < defenderAngle:
+            if player[3] < defenderAngle:
                 player.append('off')
             else:
                 player.append('on')
+
                 
     return rtPlayerInfo, btPlayerInfo
 
@@ -120,14 +129,17 @@ def label_offside_players(video, startFrame, red_tlwhs_array, blue_tlwhs_array, 
         # check offside
         if fr == startFrame:
             print("Get vanishing Points ...")
-            verticalVP = get_vertical_vanishing_point(frame, direction)           
+            # original
+            # verticalVP = get_vertical_vanishing_point(frame, direction)           
+            # heuristic
+            verticalVP = getVP(frame, direction)
             for rtid, fr_xlwh in enumerate(red_tlwhs_array):
                 rtid_lu = fr_xlwh[fr, :2]
                 if direction=='left':
                     rtidLocate = rtid_lu + [0, fr_xlwh[fr, 3:]]
                 else:
                     rtidLocate = rtid_lu + fr_xlwh[fr, 2:]
-                rtPlayerInfo.append([rtid, rtidLocate])
+                rtPlayerInfo.append([rtid, rtidLocate, fr_xlwh[fr, 3]])
                 
             for btid, fr_xlwh in enumerate(blue_tlwhs_array):
                 btid_lu = fr_xlwh[fr, :2]
@@ -135,13 +147,13 @@ def label_offside_players(video, startFrame, red_tlwhs_array, blue_tlwhs_array, 
                     btidLocate = btid_lu + [0, fr_xlwh[fr, 3:]]
                 else:
                     btidLocate = btid_lu + fr_xlwh[fr, 2:]
-                btPlayerInfo.append([btid, btidLocate])
+                btPlayerInfo.append([btid, btidLocate, fr_xlwh[fr, 3]])
             print("Find each players' angles - Red Team")
             rtPlayerInfo = makeAngles(verticalVP, rtPlayerInfo, direction)
             print("Find each players' angles - Blue Team")
             btPlayerInfo = makeAngles(verticalVP, btPlayerInfo, direction)
             
-            print("Decide Last defender player ...")
+            print("Deciding last defend player ...")
             rtPlayerInfo, btPlayerInfo, = findLastDefender(rtPlayerInfo, btPlayerInfo, attacker)
             break
         else:

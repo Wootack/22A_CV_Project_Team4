@@ -22,8 +22,8 @@ def save_video(video, startFrame, ball_xywh_array, red_tlwhs_array, blue_tlwhs_a
     fr = 0
     while True:
         ret, frame = video.read()
-        if fr == startFrame:
-            cv2.imwrite("./outputs/testimage.jpg", frame)
+        # if fr == startFrame:
+        #     cv2.imwrite("./outputs/testimage.jpg", frame)
         if not ret: break
         cv2.putText(frame, "Frame: "+str(fr), (20, 20), cv2.FONT_HERSHEY_PLAIN, 2, GRAY_COLOR, 2)
         # ball_lu = ball_xywh_array[fr, :2]
