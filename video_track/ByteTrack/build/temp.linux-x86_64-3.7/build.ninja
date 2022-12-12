@@ -1,7 +1,7 @@
 ninja_required_version = 1.3
 cxx = c++
 
-cflags = -pthread -B /home/donghohan/.conda/envs/od/compiler_compat -Wl,--sysroot=/ -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -fPIC -I/home/donghohan/compvision/final/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc -I/home/donghohan/.conda/envs/od/lib/python3.7/site-packages/torch/include -I/home/donghohan/.conda/envs/od/lib/python3.7/site-packages/torch/include/torch/csrc/api/include -I/home/donghohan/.conda/envs/od/lib/python3.7/site-packages/torch/include/TH -I/home/donghohan/.conda/envs/od/lib/python3.7/site-packages/torch/include/THC -I/home/donghohan/.conda/envs/od/include/python3.7m -c
+cflags = -pthread -B /home/donghohan/.conda/envs/cv_Offside_Detection/compiler_compat -Wl,--sysroot=/ -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -fPIC -I/home/donghohan/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc -I/home/donghohan/.conda/envs/cv_Offside_Detection/lib/python3.7/site-packages/torch/include -I/home/donghohan/.conda/envs/cv_Offside_Detection/lib/python3.7/site-packages/torch/include/torch/csrc/api/include -I/home/donghohan/.conda/envs/cv_Offside_Detection/lib/python3.7/site-packages/torch/include/TH -I/home/donghohan/.conda/envs/cv_Offside_Detection/lib/python3.7/site-packages/torch/include/THC -I/home/donghohan/.conda/envs/cv_Offside_Detection/include/python3.7m -c
 post_cflags = -O3 -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1011"' -DTORCH_EXTENSION_NAME=_C -D_GLIBCXX_USE_CXX11_ABI=0 -std=c++14
 ldflags = 
 
@@ -12,8 +12,8 @@ rule compile
 
 
 
-build /home/donghohan/compvision/final/22A_CV_Project_Team4/video_track/ByteTrack/build/temp.linux-x86_64-3.7/home/donghohan/compvision/final/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc/vision.o: compile /home/donghohan/compvision/final/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc/vision.cpp
-build /home/donghohan/compvision/final/22A_CV_Project_Team4/video_track/ByteTrack/build/temp.linux-x86_64-3.7/home/donghohan/compvision/final/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc/cocoeval/cocoeval.o: compile /home/donghohan/compvision/final/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc/cocoeval/cocoeval.cpp
+build /home/donghohan/22A_CV_Project_Team4/video_track/ByteTrack/build/temp.linux-x86_64-3.7/home/donghohan/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc/vision.o: compile /home/donghohan/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc/vision.cpp
+build /home/donghohan/22A_CV_Project_Team4/video_track/ByteTrack/build/temp.linux-x86_64-3.7/home/donghohan/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc/cocoeval/cocoeval.o: compile /home/donghohan/22A_CV_Project_Team4/video_track/ByteTrack/yolox/layers/csrc/cocoeval/cocoeval.cpp
 
 
 

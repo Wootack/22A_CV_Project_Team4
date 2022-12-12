@@ -42,7 +42,11 @@ def db_yolo(video, init_ball):
     SPORTS_BALL = 32
     h = 10
     w = 10
-
+    vid_writer = cv2.VideoWriter('./ball_result.mp4',
+            cv2.VideoWriter_fourcc(*"mp4v"),
+            video.get(cv2.CAP_PROP_FPS),
+            (int(video.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))))
     video.set(cv2.CAP_PROP_POS_FRAMES, 0)
     with open('darknet/cfg/coco.names') as f:
         labels = [line.strip() for line in f]
@@ -75,37 +79,50 @@ def db_yolo(video, init_ball):
         output_from_network = network.forward(ln)
         confidences = []
         boxes = []
+        dists = []
         for out in output_from_network:
             for detection in out:
                 scores = detection[5:]
                 class_id = np.argmax(scores)
                 if class_id != SPORTS_BALL: continue
                 confidence = scores[class_id]
-                if confidence>0.1:
-                    w = int(detection[2] * width)
-                    h = int(detection[3] * height)
-                    x = int((detection[0] - detection[2]/2) * width)
-                    y = int((detection[1] - detection[3]/2) * height)
-                    boxes.append([x, y, w, h])
+                if confidence>0.10:
+                    wc = int(detection[2] * width)
+                    hc = int(detection[3] * height)
+                    xc = int((detection[0] - detection[2]/2) * width)
+                    yc = int((detection[1] - detection[3]/2) * height)
+                    boxes.append([xc, yc, wc, hc])
                     confidences.append(float(confidence))
+                    dists.append((xc+cs-x)**2+(yc+rs-y)**2)
         indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.1, 0.4)
         boxes = np.asarray(boxes)[indexes]
+        confs = np.asarray(confidences)[indexes]
+        dsts = np.asarray(dists)[indexes]
+        print(boxes)
+        if len(boxes) > 0:
+            for cf, (xc, yc, wc, hc) in zip(dsts, boxes[0]):
+                x1loc = int(xc+cs)
+                y1loc = int(yc+rs)
+                x2loc = x1loc + int(wc)
+                y2loc = y1loc + int(hc)
+                cv2.rectangle(frame, (x1loc,y1loc), (x2loc,y2loc), (255,255,0), 2)
+                cv2.putText(frame, str(cf), (x1loc,y1loc), 2, 2, (0,0,255), 2)
+            vid_writer.write(frame)
         if len(boxes) > 0:
             min_dist = 9000000
-            # print(boxes)
-            # for python=3.7
-            boxes = boxes[0]
-            for xc, yc, wc, hc in boxes:
+            for xc, yc, wc, hc in boxes[0]:
                 dist = (xc+cs - x)**2 + (yc+rs - y)**2
                 if dist < min_dist:
                     min_dist = dist
-                    x, y, w, h = xc, yc, wc, hc
-            x += cs
-            y += rs
-            ball_loc[fr] = x, y, w, h
+                    xcc, ycc, wcc, hcc = xc, yc, wc, hc
+            if min_dist < 1200:
+                x, y, w, h = xcc, ycc, wcc, hcc
+                x += cs
+                y += rs
+                ball_loc[fr] = x, y, w, h
             # color = colors[0]
             # cv2.rectangle(frame, (x,y), (x+w,y+h), color, 2)
         # cv2.imwrite('./results/{}.png'.format(fr), frame)
         fr+=1
+    vid_writer.release()
     return ball_loc
-

@@ -64,11 +64,14 @@ def getVP(image, direction):
         blurImage = cv2.GaussianBlur(gray, (5, 5), 1)
         edges = cv2.Canny(blurImage,150,250,apertureSize = 3) 
         lines = cv2.HoughLinesP(edges,1,np.pi/180, 100, None, 20, 2)
-        if lines.any():
-            if len(lines) > 2:  
-                linesFound = True  
-            else: 
-                BlueRedMask -= 10
+        if lines is None:
+            BlueRedMask -= 10
+        else:
+            if lines.any():
+                if len(lines) > 2:  
+                    linesFound = True  
+                else: 
+                    BlueRedMask -= 10
     linePlus=[]
     lineMinus=[]
     for line in lines:

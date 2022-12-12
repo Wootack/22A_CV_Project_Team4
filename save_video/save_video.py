@@ -26,12 +26,12 @@ def save_video(video, startFrame, ball_xywh_array, red_tlwhs_array, blue_tlwhs_a
         #     cv2.imwrite("./outputs/testimage.jpg", frame)
         if not ret: break
         cv2.putText(frame, "Frame: "+str(fr), (20, 20), cv2.FONT_HERSHEY_PLAIN, 2, GRAY_COLOR, 2)
-        # ball_lu = ball_xywh_array[fr, :2]
-        # ball_rd = ball_lu + ball_xywh_array[fr, 3:]
-        # # print(ball_lu)
-        # # print(ball_rd)
-        # cv2.rectangle(frame, tuple(ball_lu), tuple(ball_rd), BALL_COLOR, 2)
-        # cv2.rectangle(frame, ball_lu, ball_rd, BALL_COLOR, 2)
+        ball_lu = ball_xywh_array[fr, :2]
+        ball_rd = ball_lu + ball_xywh_array[fr, 3:]
+        # print(ball_lu)
+        # print(ball_rd)
+        cv2.rectangle(frame, tuple(ball_lu), tuple(ball_rd), BALL_COLOR, 2)
+        cv2.rectangle(frame, ball_lu, ball_rd, BALL_COLOR, 2)
         for rtid, fr_xlwh in enumerate(red_tlwhs_array):
             rtid_lu = fr_xlwh[fr, :2]
             rtid_rd = rtid_lu + fr_xlwh[fr, 2:]

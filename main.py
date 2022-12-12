@@ -16,9 +16,10 @@ from label_offside_players.label_offside_players import label_offside_players
 datapath = './data/'
 resultpath = './results/'
 ATTACKER = 'blue'
+# ATTACKER = 'red'
 DIRECTION = 'left'
 INIT_BALL = np.array([879, 287])
-START_FRAME = 110
+START_FRAME = 310
 
 
 def make_parser():
@@ -68,7 +69,7 @@ def main(args):
 def end_to_end_pipeline(video1, attacker, direction, init_ball, args, out_path):
     # BALL DETECTION
     ball_xywh_array = []
-    # ball_xywh_array = db_yolo.db_yolo(video1, init_ball)
+    ball_xywh_array = db_yolo.db_yolo(video1, init_ball)
 
     # HUMAN DETECTION
     if args.tracking_method=='yolo':
