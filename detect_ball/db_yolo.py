@@ -129,4 +129,19 @@ def db_yolo(video, init_ball, isWrite=False):
         fr+=1
     if isWrite:
         vid_writer.release()
-    return ball_loc
+    ball_loc, touch_frames= smooth_ball(ball_loc)
+    return ball_loc, touch_frames
+
+
+def smooth_ball(ball_xywh_array):
+    target_ball_col = np.nonzero(ball_xywh_array[:,2])[0]
+    frame_len = ball_xywh_array.shape[0]
+    inter_ball = np.zeros_like(ball_xywh_array)
+    for i in range(4):
+        fp = ball_xywh_array[target_ball_col, i].flatten()
+        inter_ball[:,i] = np.interp(np.arange(frame_len), target_ball_col, fp)
+    # kick_frame = np.argmax(np.abs(np.diff(np.diff(inter_ball, axis=0), axis=0))[:,0])
+    a = np.abs(np.diff(np.diff(inter_ball, axis=0), axis=0))
+    b = np.square(a[:,:2]).sum(axis=1)
+    touch_frames = np.where(b>19)[0]
+    return inter_ball, touch_frames

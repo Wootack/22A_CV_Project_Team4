@@ -20,12 +20,12 @@ INIT_BALL = np.array([879, 287])
 isBall = True
 
 # for 014.mp4
-# ATTACKER = 'blue'
-# START_FRAME = 110
+ATTACKER = 'blue'
+START_FRAME = 110
 
 # for test2.mp4
-ATTACKER = 'red'
-START_FRAME = 310
+# ATTACKER = 'red'
+# START_FRAME = 310
 
 def make_parser():
     parser = argparse.ArgumentParser("Offside Detecting System")
@@ -74,8 +74,11 @@ def main(args):
 def end_to_end_pipeline(video1, attacker, direction, init_ball, args, out_path):
     # BALL DETECTION
     ball_xywh_array = []
+    touch_frames = []
     if isBall == True:
-        ball_xywh_array = db_yolo.db_yolo(video1, init_ball)
+        ball_xywh_array, touch_frames = db_yolo.db_yolo(video1, init_ball)
+        with open('balltemp.pickle', 'wb') as fp:
+            pickle.dump(ball_xywh_array, fp, pickle.HIGHEST_PROTOCOL)
 
     # HUMAN DETECTION
     if args.tracking_method=='yolo':
@@ -93,7 +96,7 @@ def end_to_end_pipeline(video1, attacker, direction, init_ball, args, out_path):
     # red_tags_list, blue_tags_list = label_offside_players(video1, red_tlwhs_array, blue_tlwhs_array, attacker, direction)
 
     if args.save_video:
-        save_video.save_video(video1, isBall, START_FRAME, ball_xywh_array,
+        save_video.save_video(video1, isBall, touch_frames, START_FRAME, ball_xywh_array,
             red_tlwhs_array, blue_tlwhs_array, redPlayerInfo, bluePlayerInfo, out_path)
         
         # save_video.save_video_basic(video1, ball_xywh_array,
