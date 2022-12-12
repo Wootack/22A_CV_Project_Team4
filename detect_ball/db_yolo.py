@@ -120,8 +120,8 @@ def db_yolo(video, init_ball):
         # cv2.imwrite('./results/{}.png'.format(fr), frame)
         fr+=1
     vid_writer.release()
-    ball_loc = smooth_ball(ball_loc)
-    return ball_loc
+    kick_frame, ball_loc = smooth_ball(ball_loc)
+    return ball_loc, kick_frame
 
 
 def smooth_ball(ball_xywh_array):
@@ -131,4 +131,5 @@ def smooth_ball(ball_xywh_array):
     for i in range(4):
         fp = ball_xywh_array[target_ball_col, i].flatten()
         inter_ball[:,i] = np.interp(np.arange(frame_len), target_ball_col, fp)
-    return inter_ball
+    kick_frame = np.argmax(np.abs(np.diff(np.diff(inter_ball, axis=0), axis=0))[:,0])
+    return inter_ball, kick_frame
