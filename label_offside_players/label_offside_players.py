@@ -83,7 +83,7 @@ def findLastDefender(rtPlayerInfo, btPlayerInfo, attacker):
         defenderAngle = 360.0
         lastDefender = -1        
         for player in btPlayerInfo:
-            if player[3] < defenderAngle:
+            if player[3] < defenderAngle and player[2]!=0:
                 defenderAngle = player[3]
                 lastDefender = player[0]
         for player in btPlayerInfo:
@@ -91,11 +91,12 @@ def findLastDefender(rtPlayerInfo, btPlayerInfo, attacker):
                     
         # find on/off
         for player in rtPlayerInfo:
-            if player[3] < defenderAngle:
+            if player[3] < defenderAngle and player[2]!=0:
                 player.append('off')
             else:
                 player.append('on')
-
+            print("Player "+str(player[0])+"'s degree is "+str(player[3]))
+        print("Last Defender is "+str(lastDefender)+", degree is "+str(defenderAngle))
                 
     return rtPlayerInfo, btPlayerInfo
 

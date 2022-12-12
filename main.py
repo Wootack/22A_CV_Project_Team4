@@ -20,6 +20,7 @@ ATTACKER = 'blue'
 DIRECTION = 'left'
 INIT_BALL = np.array([879, 287])
 START_FRAME = 310
+isBall = True
 
 
 def make_parser():
@@ -69,7 +70,8 @@ def main(args):
 def end_to_end_pipeline(video1, attacker, direction, init_ball, args, out_path):
     # BALL DETECTION
     ball_xywh_array = []
-    ball_xywh_array = db_yolo.db_yolo(video1, init_ball)
+    if isBall == True:
+        ball_xywh_array = db_yolo.db_yolo(video1, init_ball)
 
     # HUMAN DETECTION
     if args.tracking_method=='yolo':
@@ -87,7 +89,7 @@ def end_to_end_pipeline(video1, attacker, direction, init_ball, args, out_path):
     # red_tags_list, blue_tags_list = label_offside_players(video1, red_tlwhs_array, blue_tlwhs_array, attacker, direction)
 
     if args.save_video:
-        save_video.save_video(video1, START_FRAME, ball_xywh_array,
+        save_video.save_video(video1, isBall, START_FRAME, ball_xywh_array,
             red_tlwhs_array, blue_tlwhs_array, redPlayerInfo, bluePlayerInfo, out_path)
         
         # save_video.save_video_basic(video1, ball_xywh_array,

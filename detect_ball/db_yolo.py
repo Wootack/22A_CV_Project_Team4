@@ -98,7 +98,7 @@ def db_yolo(video, init_ball):
         boxes = np.asarray(boxes)[indexes]
         confs = np.asarray(confidences)[indexes]
         dsts = np.asarray(dists)[indexes]
-        print(boxes)
+        # print(boxes)
         if len(boxes) > 0:
             for cf, (xc, yc, wc, hc) in zip(dsts, boxes[0]):
                 x1loc = int(xc+cs)
