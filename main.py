@@ -77,6 +77,9 @@ def end_to_end_pipeline(video1, attacker, direction, init_ball, args, out_path):
     elif args.tracking_method=='hsv':
         human_tids_tlwhs_list = dh_hsv.dh_hsv(video1, args.save_video)
 
+    with open('temp.pickle', 'wb') as fp:
+        pickle.dump(human_tids_tlwhs_list, fp, pickle.HIGHEST_PROTOCOL)
+
     # TEAM CLUSTERING
     red_tlwhs_array, blue_tlwhs_array = team_cluster.team_cluster(human_tids_tlwhs_list, video1)
 

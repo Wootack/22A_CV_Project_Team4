@@ -14,7 +14,7 @@ def get_butt_HSV(box):
     some_butt = np.where(butt_S.reshape(bh, bw, 1)>100, butt_hsv, [0,0,0]).astype(np.uint8)
     some_butt = np.where(butt_V.reshape(bh, bw, 1)>50, some_butt, [0,0,0]).astype(np.uint8)
     some_butt = np.where((butt_H.reshape(bh,bw,1)>80)|(butt_H.reshape(bh,bw,1)<30), some_butt, [0,0,0]).astype(np.uint8)
-    bins = np.array([1, 30, 80, 135, 160, 180])
+    bins = np.array([1, 11, 80, 135, 160, 180])
     hist, _ = np.histogram(some_butt[:,:,0].flatten(), bins)
     category = np.argmax(hist)
     if hist.sum() < 20 or category not in [0, 2, 4]: return 0 #'else'
