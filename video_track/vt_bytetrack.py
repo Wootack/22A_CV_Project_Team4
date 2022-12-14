@@ -20,7 +20,7 @@ def vt_bytetrack(video, save_video):
     print('Tracking Human with ByteTrack ...')
     video.set(cv2.CAP_PROP_POS_FRAMES, 0)
     tids_tlwhs_list = external_call(video, TRACK_PARAMS)
-    # if save_video: save_video_result(video, tids_tlwhs_list)
+    save_video_result(video, tids_tlwhs_list)
     return tids_tlwhs_list
 
 
@@ -41,13 +41,13 @@ def save_video_result(video, tids_tlwhs_list):
     while True:
         ret, frame = video.read()
         if not ret: break
-        if i == tids_tlwhs_list[i][0]:
-            for tid, (x1, y1, w, h) in zip(*tids_tlwhs_list[i][1:3]):
-                frame = cv2.rectangle(frame, (int(x1), int(y1)),
-                            (int(x1+w), int(y1+h)), 
-                            color=gen_color(tid), thickness=3)
-                frame = cv2.putText(frame, str(tid), (int(x1), int(y1)),
-                    cv2.FONT_HERSHEY_PLAIN, 2, (0,0,255), 2)
+        tids, tswhs = tids_tlwhs_list[i]
+        for tid, (x1, y1, w, h) in zip(tids, tswhs):
+            frame = cv2.rectangle(frame, (int(x1), int(y1)),
+                        (int(x1+w), int(y1+h)), 
+                        color=gen_color(tid), thickness=2)
+            frame = cv2.putText(frame, str(tid), (int(x1), int(y1)),
+                cv2.FONT_HERSHEY_PLAIN, 2, (0,0,255), 2)
         vid_writer.write(frame)
         i+=1
     print('Result of tracking saved as ./results/bytetrack_result.mp4')

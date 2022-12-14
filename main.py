@@ -66,10 +66,10 @@ def main(args):
 
 def end_to_end_pipeline(video1, attacker, direction, init_ball, args, out_path):
     # BALL DETECTION
-    ball_xywh_array, touch_frames = db_yolo.db_yolo(video1, init_ball)
+    # ball_xywh_array, touch_frames = db_yolo.db_yolo(video1, init_ball)
 
-    with open('balltemp.pickle', 'wb') as fp:
-        pickle.dump(ball_xywh_array, fp, pickle.HIGHEST_PROTOCOL)
+    # with open('balltemp.pickle', 'wb') as fp:
+        # pickle.dump(ball_xywh_array, fp, pickle.HIGHEST_PROTOCOL)
 
     # HUMAN DETECTION
     if args.tracking_method=='yolo':
