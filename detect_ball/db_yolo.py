@@ -88,7 +88,9 @@ def db_yolo(video, init_ball, isWrite=False):
                 class_id = np.argmax(scores)
                 if class_id != SPORTS_BALL: continue
                 confidence = scores[class_id]
-                if confidence>0.10:
+                # if confidence>0.10:
+                # for testA
+                if confidence>0.010:
                     wc = int(detection[2] * width)
                     hc = int(detection[3] * height)
                     xc = int((detection[0] - detection[2]/2) * width)
@@ -96,7 +98,9 @@ def db_yolo(video, init_ball, isWrite=False):
                     boxes.append([xc, yc, wc, hc])
                     confidences.append(float(confidence))
                     dists.append((xc+cs-x)**2+(yc+rs-y)**2)
-        indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.1, 0.4)
+        # indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.1, 0.4)
+        # for testA
+        indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.01, 0.4)
         boxes = np.asarray(boxes)[indexes]
         confs = np.asarray(confidences)[indexes]
         dsts = np.asarray(dists)[indexes]
@@ -110,7 +114,7 @@ def db_yolo(video, init_ball, isWrite=False):
                     y2loc = y1loc + int(hc)
                     cv2.rectangle(frame, (x1loc,y1loc), (x2loc,y2loc), (255,255,0), 2)
                     cv2.putText(frame, str(cf), (x1loc,y1loc), 2, 2, (0,0,255), 2)
-                vid_writer.write(frame)
+            vid_writer.write(frame)
         if len(boxes) > 0:
             min_dist = 9000000
             for xc, yc, wc, hc in boxes[0]:
@@ -130,6 +134,8 @@ def db_yolo(video, init_ball, isWrite=False):
     if isWrite:
         vid_writer.release()
     ball_loc, touch_frames= smooth_ball(ball_loc)
+    if isWrite:
+        save_video_result(video, ball_loc)
     return ball_loc, touch_frames
 
 
@@ -145,3 +151,24 @@ def smooth_ball(ball_xywh_array):
     b = np.square(a[:,:2]).sum(axis=1)
     touch_frames = np.where(b>19)[0]
     return inter_ball, touch_frames
+
+def save_video_result(video, ball_loc):
+
+    video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    vid_writer = cv2.VideoWriter('./results/ball_track.mp4',
+                cv2.VideoWriter_fourcc(*"mp4v"),
+                video.get(cv2.CAP_PROP_FPS),
+                (int(video.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                    int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+    fr = 0
+    while True:
+        ret, frame = video.read()
+        if not ret: break
+        x1, y1, w, h = ball_loc[fr,:]
+        cv2.rectangle(frame, (int(x1), int(y1)),
+                        (int(x1+w), int(y1+h)), 
+                        color=(255,255,0), thickness=2)
+        vid_writer.write(frame)
+        fr+=1
+    vid_writer.release()
+    print('Result of tracking saved as ./results/ball_track.mp4')

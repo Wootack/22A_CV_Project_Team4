@@ -23,11 +23,12 @@ def save_video(video, isBall, touchFrameList, startFrame, ball_xywh_array, red_t
     height = 0
     width = 0
     if isBall == True:
-        passStart = touchFrameList[0]
-        passGot = touchFrameList[-1]
-        print("passStart Frame: ", passStart)
-        print("passGot Frame: ", passGot)
-        print(touchFrameList)
+        if len(touchFrameList)!=0:
+            passStart = touchFrameList[0]
+            passGot = touchFrameList[-1]
+            print("passStart Frame: ", passStart)
+            print("passGot Frame: ", passGot)
+            print(touchFrameList)
     
     while True:
         ret, frame = video.read()
@@ -46,12 +47,13 @@ def save_video(video, isBall, touchFrameList, startFrame, ball_xywh_array, red_t
             # print(ball_rd)
             cv2.rectangle(frame, tuple(ball_lu), tuple(ball_rd), BALL_COLOR, 2)
             # cv2.rectangle(frame, ball_lu, ball_rd, BALL_COLOR, 2)
-            if fr>=passStart and fr<passGot:
-                cv2.putText(frame, "Pass Started", (width-500, height-200),
-                    cv2.FONT_HERSHEY_PLAIN, 2, YELLOW_COLOR, 7)
-            if fr>=passGot and fr <passGot+40:
-                cv2.putText(frame, "OFFSIDE DETECTED", (width-500, height-200),
-                    cv2.FONT_HERSHEY_PLAIN, 2, RED_COLOR, 7)
+            if len(touchFrameList)!=0:
+                if fr>=passStart and fr<passGot:
+                    cv2.putText(frame, "Pass Started", (width-500, height-200),
+                        cv2.FONT_HERSHEY_PLAIN, 2, YELLOW_COLOR, 7)
+                if fr>=passGot and fr <passGot+40:
+                    cv2.putText(frame, "OFFSIDE DETECTED", (width-500, height-200),
+                        cv2.FONT_HERSHEY_PLAIN, 2, RED_COLOR, 7)
             
         for rtid, fr_xlwh in enumerate(red_tlwhs_array):
             rtid_lu = fr_xlwh[fr, :2]
